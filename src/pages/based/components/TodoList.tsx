@@ -1,14 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Switch } from '@headlessui/react';
 import { signIn, signOut, useSession } from "next-auth/react";
 import { CheckCircleIcon, LockClosedIcon, PlusIcon, StopIcon, XCircleIcon } from '@heroicons/react/20/solid'
+import { resourceLimits } from 'worker_threads';
+import { Todo } from '@prisma/client';
 
 interface Props {
   enabled: boolean;
+  tasks: any;
 }
 
 function TodoList(props: Props) {
-  const [todoList, setTodoList] = useState<string[]>([]);
+  const [todoList, setTodoList] = useState<string[]>([""]);
   const [todoInput, setTodoInput] = useState('');
 
   const addTodo = (event: React.FormEvent<HTMLFormElement>) => {
@@ -18,7 +21,11 @@ function TodoList(props: Props) {
       return;
     }
 
-    setTodoList([...todoList, todoInput]);
+    let todoInputDb = "test";
+
+    //trpc.todo.createTask.mutate(todoInputDb);
+
+    setTodoList([...todoList, todoInput.trim()]);
     setTodoInput('');
   };
 
@@ -33,6 +40,21 @@ function TodoList(props: Props) {
     newTodoList.splice(index, 1);
     setTodoList(newTodoList);
   };
+
+  const getTodos = async () => {
+    const tasks = await fetch("/api/todo/taskGetAll");
+    const temp: Array<Todo> = await tasks.json();
+    const tasksDesc = temp.map((t) => { return t.description });
+    
+    const meme = await tasksDesc.length > 0 ? tasksDesc : ["No tasks found"];
+    setTodoList(meme);
+  }
+
+  useEffect(() => {
+    if (todoList[0] === "") {
+      getTodos();
+    }
+  }, []);
 
   if (!props.enabled) {
     return(<></>);
@@ -81,16 +103,16 @@ function TodoList(props: Props) {
                 type="submit"
                 className="ml-4 flex-shrink-0 rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
               >
-                Send invite
+                Add task
               </button>
             </form>
           </div>
           <div className="mt-10">
             <h3 className="text-sm font-medium text-gray-500">
-            { todoList.length > 0 ? 'Current items in list' : 'No items in list' }
+            { (todoList == undefined || todoList.length == 0) ? 'No items in list' : 'Current items in list' }
             </h3>
             <ul role="list" className="mt-4 divide-y divide-gray-200 border-t border-b border-gray-200">
-              {todoList.map((item, index) => (
+              { (todoList == undefined || todoList.length == 0) ? (<></>) : todoList.map((item, index) => (
                 <li key={index} className="flex items-center justify-between space-x-3 py-4">
                   <div className="flex min-w-0 flex-1 items-center space-x-3">
                     <div className="min-w-0 flex-1">
@@ -119,7 +141,7 @@ function TodoList(props: Props) {
                     </button>
                   </div>
                 </li>
-              ))}
+              )) }
             </ul>
           </div>
         </div>

@@ -3,19 +3,21 @@ import Head from "next/head";
 import Link from "next/link";
 import { Switch } from '@headlessui/react';
 import { signIn, signOut, useSession } from "next-auth/react";
-import TodoList from './TodoList';
+import TodoList from './components/TodoList';
 
 import { trpc } from "../../utils/trpc";
-import React, { useState } from 'react';
+import React, { use, useEffect, useState } from 'react';
+
+import { taskGetAll, taskComplete } from "../../utils/todo";
 
 function classNames(...classes: any) {
   return classes.filter(Boolean).join(' ');
 }
 
 const Home: NextPage = () => {
-  const hello = trpc.example.hello.useQuery({ text: "from tRPC" });
-
-  const [enabled, setEnabled] = useState(true);
+  
+  const hello = trpc.todo.taskGetAll.useQuery();
+  const enabled = true;
 
   return (
     <>
@@ -41,7 +43,6 @@ const Home: NextPage = () => {
               <div className="mt-5 sm:mt-0 sm:ml-6 sm:flex sm:flex-shrink-0 sm:items-center">
                 <Switch
                   checked={enabled}
-                  onChange={setEnabled}
                   className={classNames(
                     enabled ? 'bg-indigo-600' : 'bg-gray-200',
                     'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2'
@@ -60,7 +61,7 @@ const Home: NextPage = () => {
           </Switch.Group>
         </div>
 
-        <TodoList enabled={enabled}></TodoList>
+        <TodoList tasks={hello} enabled={enabled}></TodoList>
         </main>
       </div>
     </>
