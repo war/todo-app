@@ -16,7 +16,7 @@ function classNames(...classes: any) {
 
 const Home: NextPage = () => {
   
-  const hello = trpc.todo.taskGetAll.useQuery();
+  const tasks = trpc.todo.taskGetAll.useQuery();
   const enabled = true;
 
   return (
@@ -61,7 +61,7 @@ const Home: NextPage = () => {
           </Switch.Group>
         </div>
 
-        <TodoList tasks={hello} enabled={enabled}></TodoList>
+        <TodoList tasks={tasks} enabled={enabled}></TodoList>
         </main>
       </div>
     </>
