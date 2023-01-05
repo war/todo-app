@@ -47,15 +47,6 @@ CREATE TABLE "VerificationToken" (
     "expires" DATETIME NOT NULL
 );
 
--- CreateTable
-CREATE TABLE "TodoList" (
-    "id" TEXT NOT NULL PRIMARY KEY,
-    "name" TEXT NOT NULL,
-    "description" TEXT NOT NULL,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "ownerId" TEXT NOT NULL
-);
-
 -- CreateIndex
 CREATE UNIQUE INDEX "Account_provider_providerAccountId_key" ON "Account"("provider", "providerAccountId");
 
